@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蘇軾《赤壁賦》智慧闖關挑戰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .option-btn:hover {
+            transform: scale(1.03);
+        }
+        .option-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .correct {
+            background-color: #22c55e !important; /* green-500 */
+            color: white !important;
+            border-color: #16a34a !important; /* green-600 */
+        }
+        .incorrect {
+            background-color: #ef4444 !important; /* red-500 */
+            color: white !important;
+            border-color: #dc2626 !important; /* red-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div id="quiz-container" class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl p-6 md:p-10 transition-all duration-500">
+        
+        <div id="welcome-screen">
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">蘇軾《赤壁賦》智慧闖關挑戰</h1>
+            <p class="text-center text-gray-600 mb-8">在人生的逆境中，如何尋找永恆的快樂？跟隨蘇東坡的腳步，在江水與月光中尋找答案。</p>
+            <button onclick="startQuiz()" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105">
+                開始挑戰！
+            </button>
+        </div>
+
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="level-title" class="text-2xl font-bold text-blue-700"></h2>
+                <div id="question-counter" class="text-lg font-semibold text-gray-600"></div>
+            </div>
+            <div id="question-text" class="text-xl md:text-2xl font-semibold text-gray-800 mb-8 min-h-[100px]"></div>
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+            <div class="mt-8 text-center">
+                <button id="next-question-btn" onclick="nextQuestion()" class="hidden bg-gray-800 text-white font-bold py-2 px-8 rounded-lg hover:bg-gray-900 transition-colors">
+                    下一題
+                </button>
+            </div>
+        </div>
+
+        <div id="level-result-screen" class="hidden text-center">
+            <h2 id="level-result-title" class="text-3xl font-bold text-gray-800 mb-4"></h2>
+            <p id="level-result-comment" class="text-2xl font-bold mb-2"></p>
+            <p id="level-result-score" class="text-xl text-gray-600 mb-8"></p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <button id="retry-btn" onclick="retryMissedQuestions()" class="bg-yellow-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-yellow-600 transition-transform transform hover:scale-105">
+                    錯題重練
+                </button>
+                <button id="next-level-btn" onclick="startNextLevel()" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-transform transform hover:scale-105">
+                    繼續挑戰下一關
+                </button>
+            </div>
+        </div>
+
+        <div id="final-result-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">恭喜完成所有挑戰！</h2>
+            <div id="final-analysis" class="text-left bg-gray-50 p-6 rounded-lg">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-3">總檢討與學習建議</h3>
+                <p class="mb-2"><strong>總分：</strong><span id="total-score" class="font-bold text-green-600"></span> / 30</p>
+                <div class="mb-4">
+                    <h4 class="font-bold text-lg text-gray-700">學習優勢：</h4>
+                    <p id="learning-strengths" class="text-gray-600"></p>
+                </div>
+                <div class="mb-4">
+                    <h4 class="font-bold text-lg text-gray-700">待加強領域：</h4>
+                    <p id="areas-for-improvement" class="text-gray-600"></p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg text-gray-700">個性化學習建議：</h4>
+                    <p id="personalized-advice" class="text-gray-600"></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+const questions = [
+    // --- 第一關：基礎理解 ---
+    {
+        level: 1,
+        [cite_start]question: '《赤壁賦》的作者是哪位北宋的「超級明星」文學家？ [cite: 1]',
+        options: ['王安石', '司馬光', '蘇軾', '歐陽修'],
+        answer: '蘇軾'
+    },
+    {
+        level: 1,
+        [cite_start]question: '蘇軾寫作《赤壁賦》時，他被貶官到哪個地方？ [cite: 1]',
+        options: ['京城開封', '杭州', '黃州', '海南島'],
+        answer: '黃州'
+    },
+    {
+        level: 1,
+        [cite_start]question: '故事中，蘇軾和朋友們在哪裡夜遊？ [cite: 1]',
+        options: ['西湖', '長江的赤鼻磯', '黃河', '宮殿的花園'],
+        answer: '長江的赤鼻磯'
+    },
+    {
+        level: 1,
+        [cite_start]question: '在故事裡，和蘇軾對話的兩個「精靈」是什麼？ [cite: 1]',
+        options: ['太陽精靈和月亮精靈', '江水精靈和清風精靈', '山神和土地公', '魚精和鳥精'],
+        answer: '江水精靈和清風精靈'
+    },
+    {
+        level: 1,
+        [cite_start]question: '蘇軾除了會寫詩、畫畫，故事還提到他會做哪道名菜？ [cite: 2]',
+        options: ['佛跳牆', '麻婆豆腐', '北京烤鴨', '東坡肉'],
+        answer: '東坡肉'
+    },
+    {
+        level: 1,
+        [cite_start]question: '蘇軾因為開墾了一塊名為「東坡」的土地，從此大家稱呼他為什麼？ [cite: 2]',
+        options: ['蘇學士', '蘇子瞻', '蘇東坡', '蘇仙'],
+        answer: '蘇東坡'
+    },
+    {
+        level: 1,
+        [cite_start]question: '蘇軾在哪一年寫下《赤壁賦》？ [cite: 1]',
+        options: ['公元1082年', '公元960年', '公元1279年', '公元1000年'],
+        answer: '公元1082年'
+    },
+    {
+        level: 1,
+        [cite_start]question: '故事將蘇軾「享受而不擁有」的哲學比喻成什麼現代活動？ [cite: 1]',
+        options: ['看一場要付費的電影', '玩要花錢買道具的遊戲', '玩不用花錢的免費遊戲', '買一個很貴的玩具'],
+        answer: '玩不用花錢的免費遊戲'
+    },
+    {
+        level: 1,
+        [cite_start]question: '蘇軾所屬的詞派，風格大氣磅礴，被稱為什麼？ [cite: 2]',
+        options: ['婉約派', '田園派', '邊塞派', '豪放派'],
+        answer: '豪放派'
+    },
+    {
+        level: 1,
+        [cite_start]question: '在故事開頭，蘇軾的心情是怎麼樣的？ [cite: 1]',
+        options: ['非常開心', '極度憤怒', '有點低落', '充滿希望'],
+        answer: '有點低落'
+    },
+    // --- 第二關：深入分析 ---
+    {
+        level: 2,
+        [cite_start]question: '蘇軾對江水精靈說：「你一直在變，卻從沒變！」這句話想表達什麼哲理？ [cite: 1]',
+        options: ['江水是靜止不動的', '江水有變與不變的雙重特性', '江水精靈在說謊', '江水每天都一樣'],
+        answer: '江水有變與不變的雙重特性'
+    },
+    {
+        level: 2,
+        [cite_start]question: '蘇軾為什麼用月亮的「圓」與「缺」來比喻人生的變化？ [cite: 1]',
+        options: ['因為月亮很美', '因為人生和月亮一樣，有得意也有失意的時候', '因為月亮影響潮汐', '因為古人很崇拜月亮'],
+        answer: '因為人生和月亮一樣，有得意也有失意的時候'
+    },
+    {
+        level: 2,
+        [cite_start]question: '蘇軾認為，要如何才能「一直快樂」？ [cite: 1]',
+        options: ['擁有最多的金錢', '當上最大的官', '心裡知足，享受當下', '擊敗所有的敵人'],
+        answer: '心裡知足，享受當下'
+    },
+    {
+        level: 2,
+        [cite_start]question: '成語「一蓑煙雨任平生」出自蘇軾的詞，它體現了什麼樣的人生態度？ [cite: 2]',
+        options: ['遇到困難就投降', '下雨天一定要穿蓑衣', '用瀟灑樂觀的態度面對人生風雨', '喜歡在雨中散步'],
+        answer: '用瀟灑樂觀的態度面對人生風雨'
+    },
+    {
+        level: 2,
+        [cite_start]question: '蘇軾認為江水和月光是「大自然的禮物」，這句話的深層涵義是什麼？ [cite: 1]',
+        options: ['這些自然美景是免費的，人人都可以欣賞', '大自然會送禮物給特定的人', '這些禮物可以賣錢', '他想把江水和月光打包帶走'],
+        answer: '這些自然美景是免費的，人人都可以欣賞'
+    },
+    {
+        level: 2,
+        [cite_start]question: '故事中提到蘇軾的「換角度思考」智慧，這對解決問題有什麼幫助？ [cite: 2]',
+        options: ['讓問題變得更複雜', '可以找到新的、意想不到的解決方法', '這只是在逃避問題', '沒有任何幫助'],
+        answer: '可以找到新的、意想不到的解決方法'
+    },
+    {
+        level: 2,
+        question: '《赤壁賦》這篇文章，是如何將蘇軾個人的失意情緒，昇華成普世的哲學思考的？',
+        options: ['他一直在抱怨自己的遭遇', '他透過與朋友飲酒作樂來忘記煩惱', '他藉由觀察自然萬物的變化，領悟了人生的道理', '他決定寫信向皇帝求情'],
+        answer: '他藉由觀察自然萬物的變化，領悟了人生的道理'
+    },
+    {
+        level: 2,
+        [cite_start]question: '蘇軾在黃州開墾荒地、釀酒、交朋友，這些行為反映了他什麼樣的性格特質？ [cite: 2]',
+        options: ['隨遇而安，是個熱愛生活的生活家', '自暴自棄，不想再當官', '只會死讀書的書呆子', '想當一個農夫'],
+        answer: '隨遇而安，是個熱愛生活的生活家'
+    },
+    {
+        level: 2,
+        [cite_start]question: '故事將蘇軾的哲理比喻成「遊戲攻略」，是想強調什麼？ [cite: 2]',
+        options: ['人生就像一場不能重來的遊戲', '蘇軾的智慧可以幫助我們更輕鬆地應對人生挑戰', '蘇軾非常會玩遊戲', '學習古文就像在玩遊戲'],
+        answer: '蘇軾的智慧可以幫助我們更輕鬆地應對人生挑戰'
+    },
+    {
+        level: 2,
+        question: '蘇軾提到的「不變」，指的是事物的什麼層面？',
+        options: ['外在的形態', '永恆的本質', '物理的狀態', '化學的成分'],
+        answer: '永恆的本質'
+    },
+    // --- 第三關：深層理解與應用 ---
+    {
+        level: 3,
+        question: '《赤壁賦》中「變與不變」的哲學思辨，主要在探討什麼樣的人生課題？',
+        options: ['如何在變動不居的世界中，找到內心的安頓與平靜', '如何讓時間停止', '如何讓自己永保青春', '如何賺到永不減少的財富'],
+        answer: '如何在變動不居的世界中，找到內心的安頓與平靜'
+    },
+    {
+        level: 3,
+        question: '蘇軾「享受而不必擁有」的人生觀，對於現代消費主義社會有何啟示？',
+        options: ['鼓勵大家購買更多商品', '提醒我們精神的富足比物質的佔有更重要', '認為租東西比買東西好', '主張所有東西都應該免費'],
+        answer: '提醒我們精神的富足比物質的佔有更重要'
+    },
+    {
+        level: 3,
+        [cite_start]question: '當你因為考試沒考好而難過時，若要運用蘇軾的智慧，你會怎麼想？ [cite: 2]',
+        options: ['「我真是太笨了，一切都完蛋了。」', '「都是老師出的題目太難了。」', '「這次失敗是個經驗，下次我會更厲害！」', '「我再也不要讀書了。」'],
+        answer: '「這次失敗是個經驗，下次我會更厲害！」'
+    },
+    {
+        level: 3,
+        question: '蘇軾的樂觀精神，根基於什麼？',
+        options: ['他天生就運氣好', '他對宇宙人生有深刻的洞察與理解', '他有很多有錢的朋友', '他不在乎任何事情'],
+        answer: '他對宇宙人生有深刻的洞察與理解'
+    },
+    {
+        level: 3,
+        question: '《赤壁賦》被稱為「文賦」，它與一般詩歌或散文最大的不同是什麼？',
+        options: ['它只能用來描寫風景', '它篇幅很短，字數很少', '它融合了詩歌的韻律和散文的自由，形式華美且富含哲理', '它一定要配上音樂來唱'],
+        answer: '它融合了詩歌的韻律和散文的自由，形式華美且富含哲理'
+    },
+    {
+        level: 3,
+        [cite_start]question: '故事說《赤壁賦》像一張「藏寶圖」，它最終引導我們找到的「寶藏」是什麼？ [cite: 2]',
+        options: ['蘇軾埋藏的金銀財寶', '黃州的具體位置', '通往快樂和智慧的秘訣', '一份古代的地圖'],
+        answer: '通往快樂和智慧的秘訣'
+    },
+    {
+        level: 3,
+        question: '蘇軾認為什麼是「無盡藏」，可以任我們取用而不枯竭？',
+        options: ['他家的酒', '皇帝的賞賜', '江上的清風與山間的明月', '朋友的錢財'],
+        answer: '江上的清風與山間的明月'
+    },
+    {
+        level: 3,
+        question: '從一個被貶的官員，到寫出《赤壁賦》的哲人，蘇軾的人生經歷體現了什麼？',
+        options: ['人生的失敗是無法避免的', '逆境可以成為激發智慧與創造力的契機', '當官是沒有意義的', '只有隱居才能獲得快樂'],
+        answer: '逆境可以成為激發智慧與創造力的契機'
+    },
+    {
+        level: 3,
+        question: '如果用一句話總結《赤壁賦》帶給我們的生活啟示，下列何者最貼切？',
+        options: ['人生苦短，及時行樂', '改變不了環境，就改變心境', '努力不一定會成功，但不努力會很輕鬆', '人不為己，天誅地滅'],
+        answer: '改變不了環境，就改變心境'
+    },
+    {
+        level: 3,
+        [cite_start]question: '故事將一篇古文變成有精靈的奇幻冒險，這種改寫方式最大的好處是什麼？ [cite: 1]',
+        options: ['讓原文變得更難懂', '扭曲了作者的原意', '讓深奧的哲理變得生動有趣，易於理解', '會讓蘇軾從墳墓裡跳出來抗議'],
+        answer: '讓深奧的哲理變得生動有趣，易於理解'
+    }
+];
+
+let currentLevel = 1;
+let currentQuestionIndex = 0;
+let levelScore = 0;
+let totalScore = 0;
+let levelQuestions = [];
+let missedQuestionsInLevel = [];
+let isRetryMode = false;
+
+const welcomeScreen = document.getElementById('welcome-screen');
+const quizScreen = document.getElementById('quiz-screen');
+const levelResultScreen = document.getElementById('level-result-screen');
+const finalResultScreen = document.getElementById('final-result-screen');
+
+const levelTitle = document.getElementById('level-title');
+const questionCounter = document.getElementById('question-counter');
+const questionText = document.getElementById('question-text');
+const optionsContainer = document.getElementById('options-container');
+const nextQuestionBtn = document.getElementById('next-question-btn');
+
+function startQuiz() {
+    welcomeScreen.classList.add('hidden');
+    quizScreen.classList.remove('hidden');
+    loadLevel(1);
+}
+
+function loadLevel(level) {
+    currentLevel = level;
+    levelQuestions = questions.filter(q => q.level === level);
+    currentQuestionIndex = 0;
+    levelScore = 0;
+    missedQuestionsInLevel = [];
+    isRetryMode = false;
+    
+    levelTitle.textContent = `第 ${currentLevel} 關：${getLevelName(currentLevel)}`;
+    displayQuestion();
+}
+
+function getLevelName(level) {
+    if (level === 1) return '江上紀遊';
+    if (level === 2) return '哲理思辨';
+    if (level === 3) return '智慧應用';
+    return '錯題重練';
+}
+
+function displayQuestion() {
+    nextQuestionBtn.classList.add('hidden');
+    const question = levelQuestions[currentQuestionIndex];
+    questionText.innerHTML = question.question;
+    questionCounter.textContent = `第 ${currentQuestionIndex + 1} / ${levelQuestions.length} 題`;
+    optionsContainer.innerHTML = '';
+
+    question.options.forEach(option => {
+        const button = document.createElement('button');
+        button.innerHTML = option;
+        button.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'transition-all', 'duration-300', 'bg-gray-50', 'border-gray-300', 'hover:bg-blue-100', 'hover:border-blue-400');
+        button.onclick = () => selectAnswer(button, option, question.answer);
+        optionsContainer.appendChild(button);
+    });
+}
+
+function selectAnswer(button, selectedOption, correctAnswer) {
+    const buttons = optionsContainer.querySelectorAll('button');
+    let correct = false;
+
+    if (selectedOption === correctAnswer) {
+        levelScore++;
+        correct = true;
+    } else {
+        missedQuestionsInLevel.push(levelQuestions[currentQuestionIndex]);
+    }
+
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.innerHTML === correctAnswer) {
+            btn.classList.add('correct');
+        } else if (btn === button && !correct) {
+            btn.classList.add('incorrect');
+        }
+    });
+
+    nextQuestionBtn.classList.remove('hidden');
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < levelQuestions.length) {
+        displayQuestion();
+    } else {
+        showLevelResult();
+    }
+}
+
+function showLevelResult() {
+    quizScreen.classList.add('hidden');
+    levelResultScreen.classList.remove('hidden');
+
+    const score = levelScore;
+    const total = levelQuestions.length;
+    const percentage = (score / total) * 100;
+    
+    document.getElementById('level-result-title').textContent = isRetryMode ? '重練結果' : `第 ${currentLevel} 關完成！`;
+    document.getElementById('level-result-score').textContent = `本關得分：${score} / ${total}`;
+
+    const commentEl = document.getElementById('level-result-comment');
+    if (percentage === 100) {
+        commentEl.textContent = '太棒了！您有蘇東坡的智慧與豁達！';
+        commentEl.className = 'text-2xl font-bold mb-2 text-green-500';
+    } else if (percentage >= 70) {
+        commentEl.textContent = '很不錯！已能體會文章的精髓！';
+        commentEl.className = 'text-2xl font-bold mb-2 text-blue-500';
+    } else {
+        commentEl.textContent = '再努力！換個角度思考，就能找到答案！';
+        commentEl.className = 'text-2xl font-bold mb-2 text-yellow-500';
+    }
+
+    if (!isRetryMode) {
+        totalScore += score;
+    }
+    
+    const retryBtn = document.getElementById('retry-btn');
+    if (missedQuestionsInLevel.length > 0 && !isRetryMode) {
+        retryBtn.classList.remove('hidden');
+    } else {
+        retryBtn.classList.add('hidden');
+    }
+
+    const nextLevelBtn = document.getElementById('next-level-btn');
+    if (currentLevel < 3) {
+        nextLevelBtn.textContent = '繼續挑戰下一關';
+        nextLevelBtn.classList.remove('hidden');
+    } else {
+        nextLevelBtn.textContent = '查看總結報告';
+        nextLevelBtn.classList.remove('hidden');
+    }
+}
+
+function retryMissedQuestions() {
+    levelResultScreen.classList.add('hidden');
+    quizScreen.classList.remove('hidden');
+
+    totalScore -= missedQuestionsInLevel.length;
+    levelQuestions = [...missedQuestionsInLevel];
+    currentQuestionIndex = 0;
+    levelScore = 0; 
+    missedQuestionsInLevel = [];
+    isRetryMode = true;
+
+    levelTitle.textContent = '錯題重練';
+    displayQuestion();
+}
+
+function startNextLevel() {
+    levelResultScreen.classList.add('hidden');
+    if (isRetryMode) {
+        totalScore += levelScore;
+    }
+    
+    if (currentLevel < 3) {
+        loadLevel(currentLevel + 1);
+        quizScreen.classList.remove('hidden');
+    } else {
+        showFinalAnalysis();
+    }
+}
+
+function showFinalAnalysis() {
+    finalResultScreen.classList.remove('hidden');
+    document.getElementById('total-score').textContent = totalScore;
+    
+    const performance = totalScore / 30;
+    let strengths = '';
+    let weaknesses = '';
+    let advice = '';
+
+    if (performance >= 0.9) {
+        strengths = '您對《赤壁賦》的故事情節、哲學思想及人生智慧都有極為出色的掌握！您深刻理解了蘇軾如何在逆境中找到內心的平靜與快樂。';
+        weaknesses = '表現近乎完美，展現了超凡的領悟力！';
+        advice = '恭喜您，您已是東坡居士的知音！建議您可以閱讀《後赤壁賦》，進一步體會蘇軾的心境轉折。同時，試著將「轉念」的智慧應用於生活中，您會發現處處皆是美景。';
+    } else if (performance >= 0.7) {
+        strengths = '您對文章主旨和核心哲理（如變與不變、享受與擁有）有很好的理解，並能掌握蘇軾的樂觀精神。';
+        weaknesses = '在將這些哲理應用於更抽象或現代生活的情境時，可能稍有猶豫，對細節的把握可以更精準。';
+        advice = '表現非常出色！建議您下次遇到不開心的事時，可以試著走出戶外，像蘇軾一樣觀察自然，思考什麼是短暫的、什麼又是永恆的，這有助於您更快地豁然開朗。';
+    } else if (performance >= 0.5) {
+        strengths = '您對故事的基本情節和人物有不錯的記憶，了解文章的大致內容。';
+        weaknesses = '對於「變與不變」等較為抽象的哲學概念，以及如何將其應用於生活中的理解需要加強。建議多留意第二、三關的錯題。';
+        advice = '您已具備良好的基礎！建議重新回顧故事，特別注意蘇軾是如何透過與「江水精靈」和「清風精靈」的對話，來闡述自己的觀點的。這有助於您理解文章的核心論證。';
+    } else {
+        strengths = '您勇敢地完成了所有挑戰，這是通往智慧的第一步！';
+        weaknesses = '對故事細節、人物對話背後的哲理，以及文章主旨的掌握度較低。';
+        advice = '別氣餒！蘇軾的智慧也不是一天練成的。強烈建議您重新聽一次故事，這次的任務是，當蘇軾遇到問題時，試著暫停一下，自己先想想答案，再聽聽蘇軾是怎麼說的。加油，快樂的秘訣就在其中！';
+    }
+
+    document.getElementById('learning-strengths').textContent = strengths;
+    document.getElementById('areas-for-improvement').textContent = weaknesses;
+    document.getElementById('personalized-advice').textContent = advice;
+}
+
+</script>
+</body>
+</html>
